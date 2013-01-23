@@ -1,0 +1,46 @@
+**** Tema LFA ****
+*** Constantin Șerban-Rădoi 333CA ***
+** Ianuarie 2013 **
+
+Compilare:
+    make
+Rulare:
+    ./mtx [numeFișier] [numeMașină] [configurațieBandă]
+
+
+Tema presupune parsarea unor fișiere ce descriu mașini turing printr-o gramatică
+definită precum în enunț. Parsarea este urmată apoi de execuția uneia dintre
+mașini, pentru o anumită bandă dată.
+
+Tema este rezolvată exclusiv în fișierul mtx.l, care după trecerea prin FLEX, și
+compilare rezultă fișierul executabil mtx.
+
+Partea de parsare a gramaticii am făcut-o folosind expresii regulate și stări.
+Programul așteaptă inițial definiția alfabetului, după care intră într-o stare
+în care așteaptă *nume*. Dacă numele este urmat de simbolul '=', se trece în
+starea de declarare a unui simbol; pentru ':=', se trece în starea de declarare
+a unui set de simboluri, iar pentru '::=', se trece în starea de declarare a
+unei mașini Turing. La ';' se revine în starea anterioară, de așteptat nume.
+
+Primele două stări de definiție, se termină, imediat, respectiv la întâlnirea
+simbolului '}' pentru seturi.
+Declararea de mașini turing declanșează o nouă stare, aceea de definire a unei
+tranziții la întâlnirea simbolului '('. Pentru toate celelalte cazuri, se rămâne
+în starea curentă. La ';' se iese înapoi în starea de așteptare de nume.
+
+Tranziția, la rândul ei va declanșa și ea o stare în care se declară seturi, la
+terminarea căreia se trece într-o stare în care așteaptă simbolul '->' pentru un
+branch, de unde ajunge în starea de declarare de mașini turing.
+
+Banda este ținută într-un deque de caractere, în care se memorează toate
+simbolurile, mai puțin capul de citire ('>'), care este ținut separat ca un
+index.
+
+O mașină turing este definită ca o clasă abstractă, care are o metodă de
+execuție și un pointer către o altă mașină turing. Din această clasă extind
+toate celelalte clase care definesc mașinile elementare (L|R,L(#) etc),
+respectiv mașini care se folosesc de tranziții, variabile etc.
+
+Practic, la rulare, se va căuta mașina în map-ul de mașini turing după nume, iar
+dacă este găsită, se apelează "execute()", care va apela execute() pe tot lanțul
+de mașini după ce se termină de executat mașina curentă.
